@@ -1,0 +1,47 @@
+---
+# tasks file for /etc/ansible/roles/apache
+- import_tasks: install.yml
+- import_tasks: configure.yml
+- import_tasks: service.yml
+
+
++++++++++++++++++++++++++++++++++++++
+Install.yml
+
+---
+- name: Install httpd Package
+  yum: name=httpd state=latest
+
+=========================================
+
+Configure.yml
+
+---
+- name: Copy index.html file
+  copy: src=/tmp/index.html dest=/var/www/html
+  notify:
+  - restart apache
+  
+===============================================
+Service.yml
+
+---
+- name: Start and Enable httpd service
+  service: name=httpd state=restarted enabled=yes
+  
+______________________________________________________
+
+handlers>> main.yml
+
+- name: restart apache
+  service: name=httpd state=restarted
+  
+========================================================
+
+runsetup.yml 
+
+---
+ - hosts: nodes
+   become: yes
+   roles:
+   - apache
